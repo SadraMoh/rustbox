@@ -1,48 +1,43 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, sprite::Anchor};
 
-struct GreetTimer(Timer);
+const PLAYER_SPRITE: &str = "player.png";
 
-fn greet_people(time: Res<Time>, mut timer: ResMut<GreetTimer>, query: Query<&Name, With<Person>>) {
-    if timer.0.tick(time.delta()).just_finished() {
-        for name in query.iter() {
-            println!("hello {}!", name.0);
-        }
-    }
-}
+const WINDOW_WIDTH: f32 = 400.;
+const WINDOW_HEIGHT: f32 = 300.;
 
-#[derive(Component)]
-struct Person;
+fn setup_scene(mut commands: Commands, mut windows: ResMut<Windows>) {
+    // camera
+    commands.spawn_bundle(Camera2dBundle::default());
 
-#[derive(Component)]
-struct Name(String);
+    // capture window size
+    let window = windows.get_primary_mut().unwrap();
+    let (wind_w, win_h) = (window.width(), window.height());
 
-fn add_people(mut commands: Commands) {
-    commands
-        .spawn()
-        .insert(Person)
-        .insert(Name("Elaina Proctor".to_string()));
-    commands
-        .spawn()
-        .insert(Person)
-        .insert(Name("Renzo Hume".to_string()));
-    commands
-        .spawn()
-        .insert(Person)
-        .insert(Name("Zayna Nieves".to_string()));
-}
+    window.set_position(IVec2 {
+        x: 1920 - wind_w as i32,
+        y: 0,
+    });
 
-pub struct HelloPlugin;
-
-impl Plugin for HelloPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_startup_system(add_people).add_system(greet_people);
-    }
+    commands.spawn_bundle(SpriteBundle {
+        sprite: Sprite {
+            color: Color::rgb(0.25, 0.25, 0.75),
+            custom_size: Some(Vec2::new(20., 20.)),
+            ..default()
+        },
+        ..default()
+    });
 }
 
 fn main() {
     App::new()
-        .insert_resource(GreetTimer(Timer::from_seconds(2.0, true)))
+        .insert_resource(ClearColor(Color::BLACK))
+        .insert_resource(WindowDescriptor {
+            title: String::from("My Rusty Game"),
+            width: WINDOW_WIDTH,
+            height: WINDOW_HEIGHT,
+            ..default()
+        })
+        .add_startup_system(setup_scene)
         .add_plugins(DefaultPlugins)
-        .add_plugin(HelloPlugin)
         .run();
 }
