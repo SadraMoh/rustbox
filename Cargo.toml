@@ -12,10 +12,4 @@ opt-level = 1
 opt-level = 3
 
 [dependencies]
-bevy = { version = "0.8.0", features = ["dynamic"] }
-rand = "0.8.5"
 text_io = "0.1.12"
-
-# NOTES
-# 
-# - use Camera2dBundle::default() instead of OrthographicCameraBundle::new_2d() if you are getting "failed to resolve: use of undeclared type `OrthographicCameraBundle`"
